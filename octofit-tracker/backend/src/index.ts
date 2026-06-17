@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import workoutRoutes from './routes/workouts';
+import goalRoutes from './routes/goals';
 
 dotenv.config();
 
@@ -42,6 +44,10 @@ app.get('/api/status', (req: Request, res: Response) => {
   });
 });
 
+// API Routes
+app.use('/api/workouts', workoutRoutes);
+app.use('/api/goals', goalRoutes);
+
 // 404 Handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({
@@ -50,8 +56,21 @@ app.use((req: Request, res: Response) => {
   });
 });
 
+// Error Handler
+app.use((err: any, req: Request, res: Response, next: any) => {
+  console.error('❌ Error:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+  });
+});
+
 // Start Server
 app.listen(port, () => {
   console.log(`🚀 Server is running at http://localhost:${port}`);
   console.log(`📊 MongoDB URI: ${mongoUri}`);
+  console.log(`\n📚 API Documentation:`);
+  console.log(`   Workouts: GET/POST /api/workouts`);
+  console.log(`   Goals: GET/POST /api/goals`);
+  console.log(`   Health: GET /api/health`);
+  console.log(`   Status: GET /api/status`);
 });
